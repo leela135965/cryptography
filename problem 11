@@ -1,0 +1,21 @@
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    int gridSize = 5; // Size of the Playfair grid
+    int numLetters = gridSize * gridSize; // Total number of letters in the grid
+    unsigned long long possibleKeys = 1;
+
+    // Calculate the factorial of numLetters
+    for (int i = 2; i <= numLetters; i++) {
+        possibleKeys *= i;
+    }
+
+    // Calculate the approximate power of 2
+    double powerOf2 = log2((double)possibleKeys);
+
+    printf("Number of possible keys: %llu\n", possibleKeys);
+    printf("Approximate power of 2: %.2f\n", powerOf2);
+
+    return 0;
+}

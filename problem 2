@@ -1,0 +1,56 @@
+def encrypt(playfair_matrix, plaintext):
+    plaintext = plaintext.upper().replace("J", "I")
+    ciphertext = ""
+    i = 0
+    while i < len(plaintext):
+        if i == len(plaintext) - 1 or plaintext[i] == plaintext[i + 1]:
+            plaintext = plaintext[:i + 1] + "X" + plaintext[i + 1:]
+        i += 2
+
+    for i in range(0, len(plaintext), 2):
+        row1, col1 = find_coordinates(playfair_matrix, plaintext[i])
+        row2, col2 = find_coordinates(playfair_matrix, plaintext[i + 1])
+
+        if row1 == row2:
+            ciphertext += playfair_matrix[row1][(col1 + 1) % 5] + playfair_matrix[row2][(col2 + 1) % 5]
+        elif col1 == col2:
+            ciphertext += playfair_matrix[(row1 + 1) % 5][col1] + playfair_matrix[(row2 + 1) % 5][col2]
+        else:
+            ciphertext += playfair_matrix[row1][col2] + playfair_matrix[row2][col1]
+
+    return ciphertext
+
+def decrypt(playfair_matrix, ciphertext):
+    decrypted_text = ""
+    for i in range(0, len(ciphertext), 2):
+        row1, col1 = find_coordinates(playfair_matrix, ciphertext[i])
+        row2, col2 = find_coordinates(playfair_matrix, ciphertext[i + 1])
+
+        if row1 == row2:
+            decrypted_text += playfair_matrix[row1][(col1 - 1) % 5] + playfair_matrix[row2][(col2 - 1) % 5]
+        elif col1 == col2:
+            decrypted_text += playfair_matrix[(row1 - 1) % 5][col1] + playfair_matrix[(row2 - 1) % 5][col2]
+        else:
+            decrypted_text += playfair_matrix[row1][col2] + playfair_matrix[row2][col1]
+
+    return decrypted_text
+
+def main():
+    key = "KEYWORD"
+    plaintext = "HELLOPLAYFAIR"
+
+    playfair_matrix = generate_playfair_matrix(key)
+
+    encrypted_text = encrypt(playfair_matrix, plaintext)
+    decrypted_text = decrypt(playfair_matrix, encrypted_text)
+
+    print("Playfair Matrix:")
+    for row in playfair_matrix:
+        print(row)
+
+    print("\nPlaintext:", plaintext)
+    print("Encrypted:", encrypted_text)
+    print("Decrypted:", decrypted_text)
+
+if __name__ == "__main__":
+    main()

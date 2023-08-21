@@ -1,0 +1,55 @@
+class PolyAlphabeticCipher:
+    def __init__(self, key):
+        self.key = key.upper()
+        self.key_length = len(self.key)
+    
+    def encrypt(self, plaintext):
+        ciphertext = ""
+        key_index = 0
+        
+        for char in plaintext:
+            if char.isalpha():
+                shift = ord(self.key[key_index % self.key_length]) - ord('A')
+                if char.islower():
+                    base = ord('a')
+                else:
+                    base = ord('A')
+                
+                encrypted_char = chr(((ord(char) - base + shift) % 26) + base)
+                ciphertext += encrypted_char
+                key_index += 1
+            else:
+                ciphertext += char
+        
+        return ciphertext
+    
+    def decrypt(self, ciphertext):
+        plaintext = ""
+        key_index = 0
+        
+        for char in ciphertext:
+            if char.isalpha():
+                shift = ord(self.key[key_index % self.key_length]) - ord('A')
+                if char.islower():
+                    base = ord('a')
+                else:
+                    base = ord('A')
+                
+                decrypted_char = chr(((ord(char) - base - shift + 26) % 26) + base)
+                plaintext += decrypted_char
+                key_index += 1
+            else:
+                plaintext += char
+        
+        return plaintext
+
+# Example usage
+key = "KEY"
+cipher = PolyAlphabeticCipher(key)
+
+plaintext = "Hello, World!"
+encrypted_text = cipher.encrypt(plaintext)
+print("Encrypted:", encrypted_text)
+
+decrypted_text = cipher.decrypt(encrypted_text)
+print("Decrypted:", decrypted_text)

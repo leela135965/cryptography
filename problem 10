@@ -8,10 +8,9 @@ def find_position(matrix, letter):
 def playfair_encrypt(matrix, plaintext):
     ciphertext = ""
     
-    # Prepare the plaintext: convert to uppercase, replace J with I, remove punctuation and spaces
+   
     plaintext = plaintext.upper().replace("J", "I").replace(".", "").replace(" ", "")
-    
-    # Break the plaintext into digraphs
+
     i = 0
     digraphs = []
     while i < len(plaintext):

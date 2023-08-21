@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define SIZE 2
+
+// Function to perform matrix multiplication
+void matrixMultiply(int key[SIZE][SIZE], int input[SIZE]) {
+    int result[SIZE] = {0};
+
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            result[i] += key[i][j] * input[j];
+        }
+        result[i] %= 26; // Modulo 26 to handle the alphabets
+    }
+
+    for (int i = 0; i < SIZE; i++) {
+        input[i] = result[i];
+    }
+}
+
+// Encrypt function
+void encrypt(int key[SIZE][SIZE], char message[]) {
+    int length = strlen(message);
+    int block[SIZE];
+
+    printf("Encrypted message: ");
+    
+    for (int i = 0; i < length; i += SIZE) {
+        block[0] = message[i] - 'a';
+        block[1] = message[i + 1] - 'a';
+
+        matrixMultiply(key, block);
+
+        printf("%c%c", block[0] + 'a', block[1] + 'a');
+    }
+
+    printf("\n");
+}
+
+// Decrypt function
+void decrypt(int inverseKey[SIZE][SIZE], char ciphertext[]) {
+    int length = strlen(ciphertext);
+    int block[SIZE];
+
+    printf("Decrypted message: ");
+
+    for (int i = 0; i < length; i += SIZE) {
+        block[0] = ciphertext[i] - 'a';
+        block[1] = ciphertext[i + 1] - 'a';
+
+        matrixMultiply(inverseKey, block);
+
+        printf("%c%c", block[0] + 'a', block[1] + 'a');
+    }
+
+    printf("\n");
+}
+
+int main() {
+    int key[SIZE][SIZE] = {
+        {9, 4},
+        {5, 7}
+    };
+    
+    // Calculate the determinant of the key matrix
+    int det = key[0][0] * key[1][1] - key[0][1] * key[1][0];
+    det = (det + 26) % 26; // Modulo 26 to handle negative values
+
+    // Calculate the modular multiplicative inverse of the determinant
+    int inverseDet = -1;
+    for (int i = 0; i < 26; i++) {
+        if ((det * i) % 26 == 1) {
+            inverseDet = i;
+            break;
+        }
+    }
+
+    if (inverseDet == -1) {
+        printf("Inverse determinant doesn't exist. Cannot proceed.\n");
+        return 1;
+    }
+
+    // Calculate the adjugate matrix
+    int inverseKey[SIZE][SIZE];
+    inverseKey[0][0] = key[1][1];
+    inverseKey[0][1] = -key[0][1];
+    inverseKey[1][0] = -key[1][0];
+    inverseKey[1][1] = key[0][0];
+
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            inverseKey[i][j] = (inverseKey[i][j] * inverseDet + 26) % 26;
+        }
+    }
+
+    char message[] = "meetmeattheusualplaceattenratherthaneightoclock";
+    encrypt(key, message);
+
+    char ciphertext[] = "ahelhnsgomnlkpqlmthgpmlpnsnqcnmelq";
+    decrypt(inverseKey, ciphertext);
+
+    return 0;
+}

@@ -1,51 +1,40 @@
-def gcd(a, b):
-    while b:
-        a, b = b, a % b
-    return a
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 
-def mod_inverse(a, m):
-    for i in range(1, m):
-        if (a * i) % m == 1:
-            return i
-    return None
+void encryptVigenere(const char *plaintext, const char *key, char *ciphertext) {
+    int keyLength = strlen(key);
+    int textLength = strlen(plaintext);
 
-def affine_caesar_encrypt(text, a, b):
-    encrypted_text = ""
+    for (int i = 0; i < textLength; i++) {
+        if (isalpha(plaintext[i])) {
+            int keyIndex = i % keyLength;
+            char base = isupper(plaintext[i]) ? 'A' : 'a';
+            ciphertext[i] = (plaintext[i] - base + key[keyIndex] - 'A') % 26 + base;
+        } else {
+            ciphertext[i] = plaintext[i];
+        }
+    }
 
-    for char in text:
-        if char.isalpha():
-            shift = ord('A') if char.isupper() else ord('a')
-            encrypted_char = chr((a * (ord(char) - shift) + b) % 26 + shift)
-            encrypted_text += encrypted_char
-        else:
-            encrypted_text += char
+    ciphertext[textLength] = '\0';
+}
 
-    return encrypted_text
+int main() {
+    char plaintext[1000];
+    char key[100];
 
-def affine_caesar_decrypt(ciphertext, a, b):
-    mod_inv = mod_inverse(a, 26)
-    if mod_inv is None:
-        return "Error: 'a' value is not valid (no modular inverse exists)"
+    printf("Enter the plaintext: ");
+    scanf("%[^\n]s", plaintext);
 
-    decrypted_text = ""
+    printf("Enter the key: ");
+    scanf("%s", key);
 
-    for char in ciphertext:
-        if char.isalpha():
-            shift = ord('A') if char.isupper() else ord('a')
-            decrypted_char = chr((mod_inv * ((ord(char) - shift) - b)) % 26 + shift)
-            decrypted_text += decrypted_char
-        else:
-            decrypted_text += char
+    char ciphertext[1000];
+    encryptVigenere(plaintext, key, ciphertext);
 
-    return decrypted_text
+    printf("Original message: %s\n", plaintext);
+    printf("Key: %s\n", key);
+    printf("Encrypted message: %s\n", ciphertext);
 
-# Main program
-plaintext = input("Enter the text:")
-a = int(input("Enter the A value:"))
-b = int(input("Enter the B value:"))
-
-encrypted_text = affine_caesar_encrypt(plaintext, a, b)
-print("Encrypted:", encrypted_text)
-
-decrypted_text = affine_caesar_decrypt(encrypted_text, a, b)
-print("Decrypted:", decrypted_text)
+    return 0;
+}

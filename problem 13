@@ -1,0 +1,34 @@
+import numpy as np
+
+def matrix_mod_inverse(matrix, mod):
+    determinant = int(np.round(np.linalg.det(matrix)))
+    determinant_inv = pow(determinant, -1, mod)
+    adjugate = np.round(determinant * np.linalg.inv(matrix))
+    return (adjugate * determinant_inv) % mod
+
+def recover_key(plain1, plain2, cipher1, cipher2):
+    P = np.array([[ord(plain1[0])-65, ord(plain1[1])-65], 
+                  [ord(plain2[0])-65, ord(plain2[1])-65]])
+
+    C = np.array([[ord(cipher1[0])-65, ord(cipher1[1])-65], 
+                  [ord(cipher2[0])-65, ord(cipher2[1])-65]])
+
+    P_inv = matrix_mod_inverse(P, 26)
+    K = np.mod(np.dot(C, P_inv), 26)
+
+    return K.astype(int)
+
+def main():
+    plain1 = input("Enter first plaintext block (2 characters): ").upper()
+    cipher1 = input("Enter corresponding ciphertext block (2 characters): ").upper()
+
+    plain2 = input("Enter second plaintext block (2 characters): ").upper()
+    cipher2 = input("Enter corresponding ciphertext block (2 characters): ").upper()
+
+    key_matrix = recover_key(plain1, plain2, cipher1, cipher2)
+
+    print("\nRecovered key matrix:")
+    print(key_matrix)
+
+if _name_ == "_main_":
+    main()

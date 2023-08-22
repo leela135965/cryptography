@@ -1,35 +1,41 @@
-def generate_cipher_map(key):
-    key = key.lower()
-    alphabet = 'abcdefghijklmnopqrstuvwxyz'
-    cipher_map = {}
 
-    for i in range(len(alphabet)):
-        cipher_map[alphabet[i]] = key[i]
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 
-    return cipher_map
+void encryptVigenere(const char *plaintext, const char *key, char *ciphertext) {
+    int keyLength = strlen(key);
+    int textLength = strlen(plaintext);
 
-def encrypt(plain_text, cipher_map):
-    encrypted_text = ""
-    for char in plain_text:
-        if char.isalpha():
-            if char.isupper():
-                encrypted_text += cipher_map[char.lower()].upper()
-            else:
-                encrypted_text += cipher_map[char]
-        else:
-            encrypted_text += char
-    
-    return encrypted_text
+    for (int i = 0; i < textLength; i++) {
+        if (isalpha(plaintext[i])) {
+            int keyIndex = i % keyLength;
+            char base = isupper(plaintext[i]) ? 'A' : 'a';
+            ciphertext[i] = (plaintext[i] - base + key[keyIndex] - 'A') % 26 + base;
+        } else {
+            ciphertext[i] = plaintext[i];
+        }
+    }
 
-def main():
-    key = "zyxwvutsrqponmlkjihgfedcba"
-    plain_text = "hello world"
-    
-    cipher_map = generate_cipher_map(key)
-    encrypted_text = encrypt(plain_text, cipher_map)
-    
-    print("Plain Text:", plain_text)
-    print("Cipher Text:", encrypted_text)
+    ciphertext[textLength] = '\0';
+}
 
-if __name__ == "__main__":
-    main()
+int main() {
+    char plaintext[1000];
+    char key[100];
+
+    printf("Enter the plaintext: ");
+    scanf("%[^\n]s", plaintext);
+
+    printf("Enter the key: ");
+    scanf("%s", key);
+
+    char ciphertext[1000];
+    encryptVigenere(plaintext, key, ciphertext);
+
+    printf("Original message: %s\n", plaintext);
+    printf("Key: %s\n", key);
+    printf("Encrypted message: %s\n", ciphertext);
+
+    return 0;
+}

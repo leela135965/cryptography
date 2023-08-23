@@ -1,40 +1,46 @@
-def create_playfair_matrix(keyword):
-    alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"  # No 'J' in the matrix
-    keyword = keyword.replace("J", "I")
-    keyword = "".join(dict.fromkeys(keyword))  # Remove duplicate letters
-    matrix = []
-    for letter in keyword + alphabet:
-        if letter not in matrix:
-            matrix.append(letter)
-    playfair_matrix = [matrix[i:i+5] for i in range(0, len(matrix), 5)]
-    return playfair_matrix
+#include <stdio.h>
+#include <string.h>
+void decryptPlayfair(char message[], char key[]) {
+    int i, j;
+    char matrix[5][5];
+    int keyIndex = 0;
+    for (i = 0; i < 5; i++) {
+        for (j = 0; j < 5; j++) {
+            matrix[i][j] = key[keyIndex++];
+        }
+    }
+    for (i = 0; i < strlen(message); i += 2) {
+        char c1 = message[i];
+        char c2 = message[i + 1];
+        int r1, c1_index, r2, c2_index;
+        for (j = 0; j < 5; j++) {
+            for (int k = 0; k < 5; k++) {
+                if (matrix[j][k] == c1) {
+                    r1 = j;
+                    c1_index = k;
+                }
+                if (matrix[j][k] == c2) {
+                    r2 = j;
+                    c2_index = k;
+                }
+            }
+        }
+        if (r1 == r2) {
+            printf("%c%c", matrix[r1][(c1_index + 4) % 5], matrix[r2][(c2_index + 4) % 5]);
+        } else if (c1_index == c2_index) {
+            printf("%c%c", matrix[(r1 + 4) % 5][c1_index], matrix[(r2 + 4) % 5][c2_index]);
+        } else {
+            printf("%c%c", matrix[r1][c2_index], matrix[r2][c1_index]);
+        }
+    }
+    printf("\n");
+}
 
-def find_coordinates(matrix, letter):
-    for row in range(len(matrix)):
-        if letter in matrix[row]:
-            col = matrix[row].index(letter)
-            return row, col
-
-def decrypt_playfair(ciphertext, keyword):
-    playfair_matrix = create_playfair_matrix(keyword)
-    plaintext = ""
-    ciphertext = ciphertext.replace(" ", "").upper()
-    for i in range(0, len(ciphertext), 2):
-        pair = ciphertext[i:i+2]
-        row1, col1 = find_coordinates(playfair_matrix, pair[0])
-        row2, col2 = find_coordinates(playfair_matrix, pair[1])
-        if row1 == row2:
-            col1 = (col1 - 1) % 5
-            col2 = (col2 - 1) % 5
-        elif col1 == col2:
-            row1 = (row1 - 1) % 5
-            row2 = (row2 - 1) % 5
-        else:
-            col1, col2 = col2, col1
-        plaintext += playfair_matrix[row1][col1] + playfair_matrix[row2][col2]
-    return plaintext
-
-ciphertext = "KXJEY UREBE ZWEHE WRYTU HEYFS KREHE GOYFI WTTTU OLKSY CAJPO BOTEI ZONTX BYBNT GONEY CUZWR GDSON SXBOU YWRHE BAAHY USEDQ"
-keyword = "YOUR_KEYWORD"  # Replace with the actual keyword
-plaintext = decrypt_playfair(ciphertext, keyword)
-print("Decrypted message:", plaintext)
+int main() {
+    char message[] = "KXJEYUREBEZWEHEWRYTUHEYFSKREHEGOYFIWTTTUOLKSYCAJPOBOTEIZONTXBYBNTGONEYCUZWRGDSONSXBOUYWRHEBAAHYUSEDQ";
+    char key[] = "PLAYFIREXMBCDGHKNOQSTUVWZ";
+    
+    decryptPlayfair(message, key);
+    
+    return 0;
+}

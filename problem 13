@@ -1,34 +1,71 @@
-import numpy as np
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <math.h>
 
-def matrix_mod_inverse(matrix, mod):
-    determinant = int(np.round(np.linalg.det(matrix)))
-    determinant_inv = pow(determinant, -1, mod)
-    adjugate = np.round(determinant * np.linalg.inv(matrix))
-    return (adjugate * determinant_inv) % mod
+#define MAX_LEN 100
 
-def recover_key(plain1, plain2, cipher1, cipher2):
-    P = np.array([[ord(plain1[0])-65, ord(plain1[1])-65], 
-                  [ord(plain2[0])-65, ord(plain2[1])-65]])
+int charToNum(char c) {
+    if (isupper(c)) {
+        return c - 'A';
+    } else if (islower(c)) {
+        return c - 'a';
+    }
+    return -1; 
+}
+char numToChar(int num) {
+    return num + 'A';
+}
+void encryptHill(char *text, int *keyMatrix, int keySize) {
+    int i,j,k,textLen = strlen(text);
+    int encrypted[MAX_LEN] = {0};
 
-    C = np.array([[ord(cipher1[0])-65, ord(cipher1[1])-65], 
-                  [ord(cipher2[0])-65, ord(cipher2[1])-65]])
+    for ( i = 0; i < textLen; i += keySize) {
+        for ( j = 0; j < keySize; j++) {
+            int sum = 0;
+            for (k = 0; k < keySize; k++) {
+                sum += keyMatrix[j * keySize + k] * charToNum(text[i + k]);
+            }
+            encrypted[i + j] = sum % 26;
+        }
+    }
 
-    P_inv = matrix_mod_inverse(P, 26)
-    K = np.mod(np.dot(C, P_inv), 26)
+    for (i = 0; i < textLen; i++) {
+        text[i] = numToChar(encrypted[i]);
+    }
+}
 
-    return K.astype(int)
+int main() {
+    char plaintext[MAX_LEN];
+    int keySize;
 
-def main():
-    plain1 = input("Enter first plaintext block (2 characters): ").upper()
-    cipher1 = input("Enter corresponding ciphertext block (2 characters): ").upper()
+    printf("Enter the plaintext: ");
+    gets(plaintext);
 
-    plain2 = input("Enter second plaintext block (2 characters): ").upper()
-    cipher2 = input("Enter corresponding ciphertext block (2 characters): ").upper()
+    printf("Enter the size of the key matrix: ");
+    scanf("%d", &keySize);
 
-    key_matrix = recover_key(plain1, plain2, cipher1, cipher2)
+    int i,j,keyMatrix[MAX_LEN * MAX_LEN];
 
-    print("\nRecovered key matrix:")
-    print(key_matrix)
+    printf("Enter the key matrix (row by row):\n");
+    for ( i = 0; i < keySize; i++) {
+        for ( j = 0; j < keySize; j++) {
+            scanf("%d", &keyMatrix[i * keySize + j]);
+        }
+    }
+    int textLen = strlen(plaintext);
+    int padding = keySize - (textLen % keySize);
+    if (padding < keySize) {
+        for ( i = 0; i < padding; i++) {
+            plaintext[textLen + i] = 'X';
+        }
+        plaintext[textLen + padding] = '\0';
+    }
 
-if _name_ == "_main_":
-    main()
+    encryptHill(plaintext, keyMatrix, keySize);
+
+    printf("Encrypted text: %s\n", plaintext);
+
+    return 0;
+}

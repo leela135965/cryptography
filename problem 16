@@ -1,39 +1,46 @@
-mport string
-from collections import Counter
+#include <stdio.h>
 
-ENGLISH_FREQUENCIES = ['E', 'T', 'A', 'O', 'I', 'N', 'S', 'H', 'R', 'D', 'L', 'C', 'U', 'M', 'W', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', 'J', 'X', 'Q', 'Z']
+void generateSubkeys(const unsigned char *masterKey, unsigned char subkeys[16][6]) {
+    
+}
 
-def decrypt_substitution(ciphertext, mapping):
-    decrypted = ""
-    for char in ciphertext:
-        if char in mapping:
-            decrypted += mapping[char]
-        else:
-            decrypted += char
-    return decrypted
+void performInitialPermutation(unsigned char *data) {
+    
+}
 
-def frequency_analysis(ciphertext, n=10):
-    counter = Counter(ciphertext)
-    most_common = [item[0] for item in counter.most_common(len(ENGLISH_FREQUENCIES))]
+void performFinalPermutation(unsigned char *data) {
+    
+}
 
-    # Create possible mappings
-    possible_mappings = []
-    for i in range(n):
-        mapping = {}
-        for j, letter in enumerate(most_common):
-            mapping[letter] = ENGLISH_FREQUENCIES[j]
-        possible_mappings.append(mapping)
+void desDecrypt(unsigned char *data, const unsigned char subkeys[16][6]) {
+    
+}
 
-    plaintexts = [decrypt_substitution(ciphertext, mapping) for mapping in possible_mappings]
-    return plaintexts
+int main() {
+    
+    unsigned char masterKey[8] = {0x13, 0x34, 0x57, 0x79, 0x9B, 0xBC, 0xDF, 0xF1};
 
-def main():
-    ciphertext = input("Enter the ciphertext: ").upper()
-    n = int(input("How many possible plaintexts do you want? "))
+ 
+    unsigned char ciphertext[8] = {0x4A, 0x08, 0x2F, 0x36, 0x6C, 0x81, 0x63, 0xA5};
 
-    plaintexts = frequency_analysis(ciphertext, n)
-    for i, text in enumerate(plaintexts, 1):
-        print(f"{i}. {text}")
+   
+    unsigned char subkeys[16][6];
 
-if _name_ == "_main_":
-    main()
+   
+    generateSubkeys(masterKey, subkeys);
+
+   
+    performInitialPermutation(ciphertext);
+    desDecrypt(ciphertext, subkeys);
+    performFinalPermutation(ciphertext);
+    int i;
+
+    
+    printf("Decrypted Plaintext: ");
+    for ( i = 0; i < 8; i++) {
+        printf("%02X ", ciphertext[i]);
+    }
+    printf("\n");
+
+    return 0;
+}

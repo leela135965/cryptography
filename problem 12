@@ -1,39 +1,72 @@
-# Define the key matrix
-key_matrix = np.array([[9, 4], [5, 7]])
 
-def prepare_message(message, key_size):
-    # Remove spaces and convert message to uppercase
-    message = message.replace(" ", "").upper()
-    
-    # Append 'X' to the message if its length is not a multiple of key_size
-    while len(message) % key_size != 0:
-        message += 'X'
-    
-    return message
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <math.h>
 
-def encrypt_block(block, key_matrix):
-    block_matrix = np.array([[ord(c) - ord('A') for c in block]])
-    encrypted_matrix = np.mod(np.dot(block_matrix, key_matrix), 26)
-    encrypted_block = "".join(chr(c + ord('A')) for c in encrypted_matrix[0])
-    return encrypted_block
+#define MAX_LEN 100
 
-def encrypt_message(message, key_matrix):
-    encrypted_message = ""
-    key_size = key_matrix.shape[0]
-    prepared_message = prepare_message(message, key_size)
-    
-    for i in range(0, len(prepared_message), key_size):
-        block = prepared_message[i:i+key_size]
-        encrypted_block = encrypt_block(block, key_matrix)
-        encrypted_message += encrypted_block
-    
-    return encrypted_message
+int charToNum(char c) {
+    if (isupper(c)) {
+        return c - 'A';
+    } else if (islower(c)) {
+        return c - 'a';
+    }
+    return -1; 
+}
+char numToChar(int num) {
+    return num + 'A';
+}
+void encryptHill(char *text, int *keyMatrix, int keySize) {
+    int i,j,k,textLen = strlen(text);
+    int encrypted[MAX_LEN] = {0};
 
-def main():
-    message = "meet me at the usual place at ten rather than eight oclock"
-    encrypted_message = encrypt_message(message, key_matrix)
-    print("Original Message:", message)
-    print("Encrypted Message:", encrypted_message)
+    for ( i = 0; i < textLen; i += keySize) {
+        for ( j = 0; j < keySize; j++) {
+            int sum = 0;
+            for (k = 0; k < keySize; k++) {
+                sum += keyMatrix[j * keySize + k] * charToNum(text[i + k]);
+            }
+            encrypted[i + j] = sum % 26;
+        }
+    }
 
-if __name__ == "__main__":
-    main()
+    for (i = 0; i < textLen; i++) {
+        text[i] = numToChar(encrypted[i]);
+    }
+}
+
+int main() {
+    char plaintext[MAX_LEN];
+    int keySize;
+
+    printf("Enter the plaintext: ");
+    gets(plaintext);
+
+    printf("Enter the size of the key matrix: ");
+    scanf("%d", &keySize);
+
+    int i,j,keyMatrix[MAX_LEN * MAX_LEN];
+
+    printf("Enter the key matrix (row by row):\n");
+    for ( i = 0; i < keySize; i++) {
+        for ( j = 0; j < keySize; j++) {
+            scanf("%d", &keyMatrix[i * keySize + j]);
+        }
+    }
+    int textLen = strlen(plaintext);
+    int padding = keySize - (textLen % keySize);
+    if (padding < keySize) {
+        for ( i = 0; i < padding; i++) {
+            plaintext[textLen + i] = 'X';
+        }
+        plaintext[textLen + padding] = '\0';
+    }
+
+    encryptHill(plaintext, keyMatrix, keySize);
+
+    printf("Encrypted text: %s\n", plaintext);
+
+    return 0;
+}
